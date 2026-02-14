@@ -1,0 +1,64 @@
+
+# -----------------------------------------------------------------
+# Configuration for Parallel Water Extent Detection
+# -----------------------------------------------------------------
+
+# -- File I/O --
+# IMPORTANT: Update these paths to match your system. Use forward slashes (/) or double backslashes (\\\\).
+input_dir: '/home/arm/Documents/ARM/output/Unimodal'
+output_dir: '/data/OUTPUT/Clustering/OrganizedUnimodal/ClusterOutput'
+slope_dir: '/data/ARM_Dataset/Copernicus_Slope_UINT16'
+tiff_patterns: ['*.tif', '*.tiff', '*.TIF', '*.TIFF']
+
+# -- Processing Settings --
+# Number of parallel processes. 'null' uses all available CPU cores (recommended).
+num_workers: 128
+
+# NEW: Add this section for semaphore control
+concurrency_limit:
+  # Max number of files to load into memory at once to prevent OOM crashes.
+  # A safe starting point is half your CPU cores.
+  max_concurrent_memory_tasks: 8
+
+# -- Main Toggles --
+# Set these to 'true' or 'false' to enable/disable major steps.
+pca_enabled: true
+morphological_cleaning_enabled: true
+slope_cleaning_enabled: true # Requires correctly named slope files with FIDs
+save_membership_values: true # Set to true to save GMM/Fuzzy memberships
+
+# Bimodality check settings
+bimodality_check:
+  enabled: true
+  bands_to_check: [5, 7, 10, 11]
+  separation_factor: 2.6
+  min_weight: 0.09
+
+# -- PCA Parameters --
+pca:
+  target_variance: 0.95
+  min_components: 2
+
+# -- Clustering Parameters --
+clustering:
+  n_clusters: 2
+  kmeans:
+    n_init: 20
+    max_iter: 500
+    tolerance: 0.000001
+  gmm:
+    covariance_type: 'full'
+    n_init: 20
+    max_iter: 350
+    tolerance: 0.000001
+    reg_covar: 0.000001
+  fuzzy:
+    m: 2.0
+    max_iter: 500
+    error: 0.00001 
+
+# -- Cleaning Parameters --
+morphological_cleaning:
+  iterations: 1
+slope_cleaning:
+  max_slope_degrees: 500.0
